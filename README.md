@@ -1,38 +1,39 @@
-# Vigilant Fiesta PS3 homebrew scaffold
+## PS3 PSL1GHT integration and host demo
 
-This repository sketch provides a minimal PlayStation 3 homebrew scaffold for playing locally-owned / copyright-free media.
+This update adds a PS3-targeted Makefile scaffold and a host-friendly interactive
+terminal demo so you can see the menu and selection flow on your development
+machine before porting the UI to the PS3.
 
-IMPORTANT: This project is a learning scaffold. It does NOT include working PS3 platform bindings — you'll need to integrate PSL1GHT or your PS3 SDK, add on-screen rendering, controller handling, and playback code.
+What was added
+- psl1ght/Makefile: placeholder Makefile for building with a PSL1GHT toolchain. You MUST set PSL1GHT_PATH to your installed PSL1GHT path before building.
+- src/ps3/ps3_main.c: PS3 scaffold with TODOs showing where to add PSL1GHT/SCE calls (video, input, filesystem, playback).
+- src/host/terminal_player.c: an ncurses-based interactive demo that lists files in a media directory and lets you select one. This demonstrates the menu flow you should port to PS3 on-screen rendering.
 
-Files added
-- Makefile — placeholder build targets; replace with your PSL1GHT build commands
-- src/main.c — minimal, commented C scaffold (host-friendly stdio UI). Replace TODOs with PS3-specific code
-- scripts/transcode_ps3.sh — ffmpeg helper to prepare MP4/H.264 files for PS3
-- .gitignore — build artifacts
+Build & run the host demo (Linux/mac)
+1. Install ncurses dev package (Ubuntu example):
+   sudo apt-get install libncurses5-dev libncursesw5-dev
+2. Build:
+   gcc -o host_player src/host/terminal_player.c -lncurses
+3. Run (point to a media directory or it will try /dev_usb000):
+   ./host_player ./media
 
-Quick start (development on PC)
-1. Prepare a USB stick with your copyright-free files (e.g., sample.mp4) and mount it at /dev_usb000 (Linux host examples may vary).
-2. Transcode a file if needed:
-   ./scripts/transcode_ps3.sh sample_source.mp4 sample.mp4
-3. Build and test the host-friendly UI:
-   gcc -o vigilant_fiesta src/main.c
-   ./vigilant_fiesta
+Porting notes for PS3
+1. Ensure you have PSL1GHT installed and set PSL1GHT_PATH in psl1ght/Makefile.
+2. Replace TODOs in src/ps3/ps3_main.c with proper includes and calls. Typical tasks:
+   - Initialize PSL1GHT video and create a framebuffer you can draw into.
+   - Initialize controller input and poll pad state for navigation.
+   - Use PS3 filesystem APIs to enumerate files on /dev_usb000.
+   - Implement a playback hand-off to your chosen decoder or playback API.
+3. Build using the PSL1GHT toolchain (example):
+   cd psl1ght
+   make
 
-Porting to PS3 (high level)
-1. Install PSL1GHT or your PS3 homebrew toolchain and set up cross-compiler environment.
-2. Replace the stdio UI with PSL1GHT video initialization and draw text to screen.
-3. Use PS3 filesystem mounts (e.g., /dev_usb000) and controller input APIs to browse and select files.
-4. For playback, either:
-   - Integrate a decoder library that can run under PSL1GHT (complex), or
-   - Prepare pre-encoded MP4/H.264 files and use a minimal player that interfaces with PS3 video output.
+Safety & legal reminder
+- Only use this with content you own or that is licensed/public-domain for redistribution.
+- This project does NOT assist with DRM circumvention.
 
-Legal and safety notes
-- Only use this scaffold with content you own or that is public-domain / CC-licensed for redistribution.
-- This project does NOT provide or assist in circumventing DRM or streaming copyrighted content without authorization.
+If you want, I can now:
+- Try to implement a PSL1GHT on-screen menu example using concrete PSL1GHT API calls (I will need to know which PSL1GHT headers and toolchain you have), OR
+- Add audio/video playback stub that demonstrates how to call an existing decoder on PS3 (requires details about available decoder libraries/toolchain).
 
-Next steps I can help with
-- Convert this scaffold into a PSL1GHT project with a working build (I can add a PSL1GHT Makefile and example build commands if you have PSL1GHT installed)
-- Add a simple on-screen menu example using PSL1GHT's video/text APIs
-- Add an example of preparing PS3-optimized files and a small test suite
-
-If you want me to proceed and commit a PSL1GHT-specific Makefile and a more complete integration, confirm that you have the PSL1GHT toolchain installed on your side and I'll add the platform files.
+Which should I do next?

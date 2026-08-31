@@ -1,0 +1,7 @@
+# Development Makefile (host build + helper targets)
+
+# Host demo (ncurses) build
+host:
+	gcc -o host_player src/host/terminal_player.c -lncurses
+
+.PHONY: host
